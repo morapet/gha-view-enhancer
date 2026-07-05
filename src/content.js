@@ -18,10 +18,12 @@
   const { restoreState, applyFilter, injectToolbar, removeToolbar } = ns;
 
   // ── URL matching ─────────────────────────────────────────────────────────
-  const RUN_PAGE_RE = /^https:\/\/github\.com\/[^/]+\/[^/]+\/actions\/runs\/[^/]+/;
+  // Match any GitHub instance (github.com or GitHub Enterprise e.g. github.xyz.de).
+  // We check the pathname only so the hostname doesn't matter.
+  const RUN_PAGE_RE = /^\/[^/]+\/[^/]+\/actions\/runs\/[^/]+/;
 
   function isRunPage() {
-    return RUN_PAGE_RE.test(window.location.href);
+    return RUN_PAGE_RE.test(window.location.pathname);
   }
 
   // ── MutationObserver with debounce ───────────────────────────────────────

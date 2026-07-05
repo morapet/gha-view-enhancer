@@ -12,6 +12,7 @@ matrices (e.g. 4 × 40 = 160 jobs) are easier to read.
 - Selections are persisted via `chrome.storage.local` and survive SPA navigations.
 - Uses a `MutationObserver` to re-apply filters as matrix rows are lazily loaded.
 - Toolbar adapts to GitHub's light and dark themes.
+- Works on **github.com and GitHub Enterprise Server** (any hostname).
 
 ## Installation (unpacked / developer mode)
 
@@ -20,8 +21,8 @@ matrices (e.g. 4 × 40 = 160 jobs) are easier to read.
 3. Enable **Developer mode** (toggle in the top-right corner).
 4. Click **Load unpacked** and select the root folder of this repository
    (the directory that contains `manifest.json`).
-5. Navigate to any GitHub Actions run summary page:
-   `https://github.com/<owner>/<repo>/actions/runs/<run_id>`
+5. Navigate to any GitHub Actions run summary page on **github.com or your
+   GitHub Enterprise instance** (e.g. `https://github.xyz.de/<owner>/<repo>/actions/runs/<run_id>`).
 6. The filter toolbar will appear at the top of the jobs list.
 
 ## Usage

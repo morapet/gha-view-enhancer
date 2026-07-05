@@ -10,7 +10,7 @@
   },
   "content_scripts": [
     {
-      "matches": ["https://github.com/*/*/actions/runs/*"],
+      "matches": ["*://*/*/actions/runs/*"],
       "js": [
         "src/statusDetector.js",
         "src/filter.js",
