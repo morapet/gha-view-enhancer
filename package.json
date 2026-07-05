@@ -1,0 +1,14 @@
+{
+  "name": "gha-view-enhancer",
+  "version": "0.1.0",
+  "description": "Chrome extension that adds a filter toolbar to GitHub Actions run pages.",
+  "private": true,
+  "scripts": {
+    "lint": "eslint src/",
+    "validate-manifest": "node scripts/validate-manifest.js",
+    "package": "node scripts/package.js"
+  },
+  "devDependencies": {
+    "eslint": "^8.57.0"
+  }
+}

@@ -1,0 +1,143 @@
+/*
+ * styles.css — GHA View Enhancer
+ *
+ * Styles for the filter toolbar and hidden-row behaviour.
+ * Uses CSS custom properties with light/dark fallbacks so the toolbar
+ * fits GitHub's own colour scheme without relying on GitHub's internal
+ * class names.
+ */
+
+/* ── Variables (light defaults; dark-mode overrides below) ───────────────── */
+:root {
+  --gha-filter-bg:            #f6f8fa;
+  --gha-filter-border:        #d0d7de;
+  --gha-filter-text:          #24292f;
+  --gha-filter-btn-bg:        #f6f8fa;
+  --gha-filter-btn-border:    #d0d7de;
+  --gha-filter-btn-text:      #24292f;
+  --gha-filter-btn-hover-bg:  #eaeef2;
+  --gha-filter-accent:        #0969da;
+  --gha-filter-radius:        6px;
+  --gha-filter-shadow:        0 1px 3px rgba(27, 31, 36, 0.12);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --gha-filter-bg:            #161b22;
+    --gha-filter-border:        #30363d;
+    --gha-filter-text:          #c9d1d9;
+    --gha-filter-btn-bg:        #21262d;
+    --gha-filter-btn-border:    #30363d;
+    --gha-filter-btn-text:      #c9d1d9;
+    --gha-filter-btn-hover-bg:  #30363d;
+    --gha-filter-accent:        #58a6ff;
+    --gha-filter-shadow:        0 1px 3px rgba(0, 0, 0, 0.4);
+  }
+}
+
+/* ── Toolbar container ───────────────────────────────────────────────────── */
+#gha-filter-toolbar {
+  display:          flex;
+  flex-wrap:        wrap;
+  align-items:      center;
+  gap:              8px;
+  padding:          8px 12px;
+  margin-bottom:    8px;
+  background:       var(--gha-filter-bg);
+  border:           1px solid var(--gha-filter-border);
+  border-radius:    var(--gha-filter-radius);
+  box-shadow:       var(--gha-filter-shadow);
+  color:            var(--gha-filter-text);
+  font-family:      -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica,
+                    Arial, sans-serif;
+  font-size:        12px;
+  line-height:      1.5;
+  /* Ensure the toolbar sits above GitHub's own elements */
+  position:         relative;
+  z-index:          100;
+  box-sizing:       border-box;
+}
+
+/* ── Title label ─────────────────────────────────────────────────────────── */
+.gha-filter-title {
+  font-weight:      600;
+  white-space:      nowrap;
+  color:            var(--gha-filter-text);
+}
+
+/* ── Checkbox group ──────────────────────────────────────────────────────── */
+.gha-filter-checkboxes {
+  display:          flex;
+  flex-wrap:        wrap;
+  gap:              6px 12px;
+  align-items:      center;
+}
+
+.gha-filter-label {
+  display:          flex;
+  align-items:      center;
+  gap:              4px;
+  cursor:           pointer;
+  white-space:      nowrap;
+  color:            var(--gha-filter-text);
+  user-select:      none;
+}
+
+.gha-filter-label input[type="checkbox"] {
+  cursor:           pointer;
+  accent-color:     var(--gha-filter-accent);
+  width:            14px;
+  height:           14px;
+}
+
+/* ── Buttons ─────────────────────────────────────────────────────────────── */
+.gha-filter-buttons {
+  display:          flex;
+  gap:              6px;
+  align-items:      center;
+  margin-left:      auto;
+}
+
+.gha-filter-btn {
+  display:          inline-flex;
+  align-items:      center;
+  padding:          4px 10px;
+  background:       var(--gha-filter-btn-bg);
+  color:            var(--gha-filter-btn-text);
+  border:           1px solid var(--gha-filter-btn-border);
+  border-radius:    var(--gha-filter-radius);
+  font-size:        12px;
+  font-family:      inherit;
+  cursor:           pointer;
+  white-space:      nowrap;
+  transition:       background 0.1s ease;
+}
+
+.gha-filter-btn:hover {
+  background:       var(--gha-filter-btn-hover-bg);
+}
+
+.gha-filter-btn:focus-visible {
+  outline:          2px solid var(--gha-filter-accent);
+  outline-offset:   2px;
+}
+
+/* "Only failures" button — accent colour */
+.gha-filter-btn:first-child {
+  border-color:     var(--gha-filter-accent);
+  color:            var(--gha-filter-accent);
+}
+
+.gha-filter-btn:first-child:hover {
+  background:       color-mix(in srgb, var(--gha-filter-accent) 10%, transparent);
+}
+
+/* ── Hidden rows ─────────────────────────────────────────────────────────── */
+/*
+ * Job rows hidden by the filter.
+ * We set display:none via JS; this rule acts as a CSS fallback / override
+ * in case specificity wars arise with GitHub's own styles.
+ */
+[data-gha-hidden="true"] {
+  display: none !important;
+}
