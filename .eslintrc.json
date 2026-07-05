@@ -1,0 +1,21 @@
+{
+  "env": {
+    "browser": true,
+    "es2020": true,
+    "webextensions": true
+  },
+  "globals": {
+    "chrome": "readonly"
+  },
+  "parserOptions": {
+    "ecmaVersion": 2020,
+    "sourceType": "script"
+  },
+  "extends": ["eslint:recommended"],
+  "rules": {
+    "no-unused-vars": ["warn", { "argsIgnorePattern": "^_" }],
+    "no-console": "off",
+    "semi": ["error", "always"],
+    "eqeqeq": ["error", "always"]
+  }
+}

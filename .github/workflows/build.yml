@@ -1,0 +1,56 @@
+name: Build & Validate
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    name: Validate, Lint & Package
+    runs-on: ubuntu-latest
+
+    steps:
+      # ── Checkout ────────────────────────────────────────────────────────
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      # ── Node.js setup ───────────────────────────────────────────────────
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: "npm"
+
+      # ── Install dependencies ─────────────────────────────────────────────
+      - name: Install dependencies
+        run: npm ci
+
+      # ── Validate manifest.json ───────────────────────────────────────────
+      - name: Validate manifest.json
+        run: node scripts/validate-manifest.js
+
+      # ── Lint ─────────────────────────────────────────────────────────────
+      - name: Lint source files
+        run: npm run lint
+
+      # ── Package extension ────────────────────────────────────────────────
+      - name: Package extension
+        run: |
+          zip -r gha-view-enhancer.zip \
+            manifest.json \
+            styles.css \
+            src/ \
+            icons/
+
+      # ── Upload artifact ──────────────────────────────────────────────────
+      - name: Upload extension zip
+        uses: actions/upload-artifact@v4
+        with:
+          name: gha-view-enhancer
+          path: gha-view-enhancer.zip
+          if-no-files-found: error
