@@ -96,21 +96,21 @@ const TEXT_PATTERNS = [
 ];
 
 // ---------------------------------------------------------------------------
-// JOB ROW SELECTOR
-// The element that represents a single matrix-job row in the sidebar.
+// JOB ROW SELECTOR (CSS fallback)
+// Used only when the primary link-based findJobRows() approach yields nothing.
 //
 // ⚠️  This selector targets list items that contain a link to a job. GitHub
 // frequently changes its DOM structure; update this if rows stop being found.
 //
-// Current approach: look for <li> elements (or div/article) that contain an
-// anchor with an href matching /actions/runs/<id>/job/<jobid>.
+// NOTE: [data-testid*="job"] is intentionally excluded here because it is
+// too broad — it also matches container elements such as
+// data-testid="workflow-run-jobs-list", causing the entire job list to be
+// hidden when that container's status is filtered out.
 // ---------------------------------------------------------------------------
 const JOB_ROW_SELECTOR =
   // Sidebar job list items — GitHub currently renders these as <li> with a
-  // child anchor whose href contains "/actions/runs/".  We also accept any
-  // element with a data-component or role="listitem" as a safety net.
+  // child anchor whose href contains "/actions/runs/".
   'li[class*="job"], ' +
-  '[data-testid*="job"], ' +
   'li:has(a[href*="/actions/runs/"][href*="/job/"])';
 
 // ---------------------------------------------------------------------------
@@ -205,18 +205,59 @@ function detectRowStatus(rowEl) {
 /**
  * Return all job row elements currently present in the document.
  *
+ * Primary strategy: locate every anchor that links to an individual job page
+ * (href contains both "/actions/runs/" and "/job/"), then walk up the DOM to
+ * find the nearest single-job container element for each link.
+ *
+ * This approach works for BOTH:
+ *  - the sidebar job list (links inside <li> elements), AND
+ *  - the visual workflow matrix / graph (links inside <div> or other elements).
+ *
+ * It also avoids accidentally matching container elements such as
+ * [data-testid="workflow-run-jobs-list"] that wrap all jobs at once — which
+ * was the root cause of "uncheck Success → everything disappears".
+ *
  * @returns {Element[]}
  */
 function findJobRows() {
-  try {
-    return Array.from(document.querySelectorAll(JOB_ROW_SELECTOR));
-  } catch (_err) {
-    // Selector syntax error (e.g. :has() not supported) — degrade gracefully.
-    // Fall back to the simpler first clause only.
-    return Array.from(
-      document.querySelectorAll('li[class*="job"], [data-testid*="job"]')
-    );
+  const seenContainers = new Set();
+  const rows = [];
+
+  // Find every anchor that points to an individual job detail page.
+  const jobLinks = document.querySelectorAll(
+    'a[href*="/actions/runs/"][href*="/job/"]'
+  );
+
+  for (const link of jobLinks) {
+    // Walk up to find the nearest element that represents a single job.
+    // We check common structural roles/tags; if none matches we fall back
+    // to the direct parent so that div-based matrix cells are also captured.
+    const container =
+      link.closest("li") ||
+      link.closest('[role="listitem"]') ||
+      link.closest('[role="treeitem"]') ||
+      link.closest("article") ||
+      link.parentElement;
+
+    if (!container || container === document.body) continue;
+
+    if (!seenContainers.has(container)) {
+      seenContainers.add(container);
+      rows.push(container);
+    }
   }
+
+  // Fallback: if the page has no job links yet (e.g. still loading) try the
+  // CSS selector approach.
+  if (rows.length === 0) {
+    try {
+      return Array.from(document.querySelectorAll(JOB_ROW_SELECTOR));
+    } catch (_err) {
+      return Array.from(document.querySelectorAll("li[class*='job']"));
+    }
+  }
+
+  return rows;
 }
 
 // Expose via simple globals (content scripts share the page JS scope).
